@@ -1,0 +1,13 @@
+{
+    "name": "dsCDN",
+    "description": "",
+    "author": "Michael Fryer",
+    "version": "0.0.0",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/sciencemine/dsCDN"
+    },
+    "dependencies": {
+    }
+}
