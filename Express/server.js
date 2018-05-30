@@ -11,6 +11,7 @@ const express = require('express');
 //---------------------
 //- Additional Routes -
 //---------------------
+const ce = require('./routes/ce');
 
 //--------------------
 //- Script Constants -
@@ -32,21 +33,22 @@ app.listen(port, () => {
 //--------------------
 //- App Static Files -
 //--------------------
-app.use(express.static(static_path, { dotfiles: 'ignore' }));
+app.use(ce);
+// app.use(express.static(static_path, { dotfiles: 'ignore' }));
 
 //-----------------
 //- Set up Routes -
 //-----------------
 // Bad request
 function badRequest(req, res) {
-    res.status(400).send('Bad Request');
+    res.status(400).send('Bad Request\n');
 }
 
 // All other routes
 app.route('*')
 // Define get requests to 404
 .get((req, res) => {
-    res.status(404).send('Page not Found');
+    res.status(404).send('Page not Found\n');
 })
 .all(badRequest);
 
