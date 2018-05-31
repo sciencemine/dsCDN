@@ -12,71 +12,73 @@ router.route('/ce/:id')
     let ceID = new mongo.ObjectID(req.params.id);
 
     // get the ce from mongo
-    // let ceObj = testData;
-
     MongoClient.connect(mongoURL, (err, client) => {
-        if (err) throw err;
+        if (err) {
+            console.error(err);
+
+            res.status(500);
+
+            return;
+        }
 
         const db = client.db(dbName);
 
         // do the query
-        query(db, 'ces', ceID,)
+        query(db, 'ces', ceID)
         .then((doc) => {
             let ceObj = doc,
                     promises = [],
                     hasTeaser = false;
 
+            // if the playlist has a teaser query for it
             if (!Array.isArray(ceObj.playlist[0])) {
                 query(db, 'assets', new mongo.ObjectID(ceObj.playlist[0]))
                 .then((doc) => {
                     ceObj.playlist[0] = doc;
                 })
-                .catch((err) => {
-                    throw err;
-                });
+                .catch(queryErr);
 
                 hasTeaser = true;
             }
 
             // replace all assets in the playlist
             for (let i = (hasTeaser ? 1 : 0); i < ceObj.playlist.length; i++) {
-                let item = ceObj.playlist[i];
+                let assetList = ceObj.playlist[i]
 
-                promises.push(query(db, 'assets', new mongo.ObjectID(item[0]))
-                    .then((doc) => {
-                        item[0] = doc;
-                    })
-                    .catch((err) => {
-                        throw err;
-                    })
-                );
+                // push the query for the primary asset of this sequence into the set
+                promises.push(query(db, 'assets', new mongo.ObjectID(assetList[0]))
+                        .then((doc) => {
+                            assetList[0] = doc;
+                        })
+                        .catch(queryErr));
 
                 // replace all concurrent assets
-                item[1].forEach((conAsset, index) => {
+                assetList[1].forEach((conAsset, index) => {
                     promises.push(query(db, 'assets', new mongo.ObjectID(conAsset))
-                        .then((doc) => {
-                            item[1][index] = doc;
-                        })
-                        .catch((err) => {
-                            throw err;
-                        })
-                    );
+                            .then((doc) => {
+                                conAsset = doc;
+                            })
+                            .catch(queryErr));
                 });
             }
 
             Promise.all(promises)
             .then((values) => {
                 res.status(200).json(ceObj);
+            })
+            .catch(() => {
+                res.status(500).send('Something went wrong\n');
             });
         })
         .catch((err) => {
-            throw err;
-            res.status(404).json(err);
+            console.error(err);
+
+            res.status(500);
         });
     });
 })
 .all((req, res) => {
-    res.status(403).send('Done Bork.\n')
+    res.status(405);
 });
 
 function query(db, collectionName, id) {
@@ -89,6 +91,10 @@ function query(db, collectionName, id) {
             resolve(doc[0]);
         });
     });
+}
+
+function queryErr(err) {
+    console.error(err);
 }
 
 module.exports = router;
