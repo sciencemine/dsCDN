@@ -81,6 +81,39 @@ router.route('/ce/:id')
     res.status(405);
 });
 
+router.route('/ce')
+.get((req, res) => {
+    MongoClient.connect(mongoURL, (err, client) => {
+        if (err) {
+            console.error(err);
+
+            res.status(500);
+
+            return;
+        }
+
+
+        const db = client.db(dbName);
+
+        let collection = db.collection('ces');
+
+        collection.find({}, { projection: { _id: 1 } }).toArray((err, docs) => {
+            if (err) {
+                console.error(err);
+
+                res.status(500);
+
+                return;
+            }
+
+            res.status(200).json(docs);
+        });
+    });
+})
+.all((req, res) => {
+    res.status(405);
+});
+
 function query(db, collectionName, id) {
     return new Promise((resolve, reject) => {
         let collection = db.collection(collectionName);
