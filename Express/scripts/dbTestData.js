@@ -11,8 +11,12 @@ MongoClient.connect(url, (err, client) => {
 
     const db = client.db(dbName);
 
-    insert(db, () => {
-        client.close();
+    createAssets(db, (res) => {
+        console.log(res.insertedIds);
+        createCEs(db, res.insertedIds, (res) => {
+            console.log(`Created CEs ${res.insertedIds}`);
+            client.close();
+        });
     });
 });
 
@@ -32,7 +36,17 @@ function asset(url, type, title, description, version = '0.0.0', options) {
     }
 }
 
-function insert(db, callback) {
+function ce(title, playlist, description, version = '0.0.0') {
+    this.version = version;
+    this.title = title;
+    this.playlist = playlist;
+
+    if (description) {
+        this.description = description;
+    }
+}
+
+function createAssets(db, callback) {
     const collection = db.collection('assets');
 
     collection.insertMany([
@@ -42,6 +56,36 @@ function insert(db, callback) {
                 'More on Critters'),
         new asset(path.join(remoteURL, 'SM-HSt-Critr2-1s.mp4'), 'video/mp4',
                 'Advanced Critters')
+    ], (err, res) => {
+        callback(res);
+    });
+}
+
+function createCEs(db, assets, callback) {
+    const collection = db.collection('ces');
+
+    collection.insertMany([
+        new ce('Test ce', [[ assets[1], [] ]]),
+        new ce('Has Teaser',
+            [
+                assets[0],
+                [
+                    assets[1],
+                    [ assets[2] ]
+                ]
+            ]),
+        new ce('Lot of Stuff',
+            [
+                assets[0],
+                [
+                    assets[1],
+                    [ assets[0], assets[1], assets[2] ]
+                ],
+                [
+                    assets[2],
+                    [ assets[2], assets[1], assets[0] ]
+                ]
+            ])
     ], (err, res) => {
         console.log('Inserted the items');
         callback(res);

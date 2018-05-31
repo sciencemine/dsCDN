@@ -56,7 +56,7 @@ router.route('/ce/:id')
                 assetList[1].forEach((conAsset, index) => {
                     promises.push(query(db, 'assets', new mongo.ObjectID(conAsset))
                             .then((doc) => {
-                                conAsset = doc;
+                                assetList[1][index] = doc;
                             })
                             .catch(queryErr));
                 });
