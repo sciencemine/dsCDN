@@ -80,14 +80,14 @@ class dsm {
 		}
 		this.attributes = [
 			{
-				title = "kenny"
+				title: "kenny"
 			}
 		]
 		this.config = {
-			idle = 0,
-			menuDwell = 0,
-			popOverDwell = 0,
-			popOverShowDelay = 0
+			idle : 0,
+			menuDwell : 0,
+			popOverDwell : 0,
+			popOverShowDelay : 0
 		}
 	}
 }

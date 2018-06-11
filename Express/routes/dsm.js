@@ -26,13 +26,15 @@ router.route('/dsm/:id')
 		//query time! woo!
 		query(db, 'dsm', dsmID) 
 		.then((doc) => { //I *promise* to come back with things :P
-			let dsmObj = doc, promises = [];
+			let dsmObj = doc,
+				promises = [];
 			
-			res.status(200).json(dsmObj[0])
-			return
+			for (let i = 0; i < dsmObj.ce_set.length; i++ ) {
+				let ceId = dsmObj.ce_set[i]
+				
+			}
+
 		})
-		.catch((queryError) => {//I broke my promise guys, I'm sorry
-			res.status(404).send()
-		}) 
+		.catch(queryErr) //I broke my promise guys, I'm sorry
 	})
 })
