@@ -15,25 +15,81 @@ MongoClient.connect(url, (err, client) => {
         console.log(res.insertedIds);
         createCEs(db, res.insertedIds, (res) => {
             console.log(`Created CEs ${res.insertedIds}`);
-            client.close();
-        });
+		});
+		populateDSMs(db, res.insertedIds, (res) =>  {
+			console.log(`Created DSMs ${res.insertedIds}`)
+			client.close()
+		})
     });
 });
 
-function asset(url, type, title, description, version = '0.0.0', options) {
-    this.url = url;
-    this.type = type
-    this.version = version;
+class asset {
+	constructor (url, type, title, description, version = '0.0.0', options){
+		this.url = url;
+		this.type = type
+		this.version = version;
 
-    if (title) {
-        this.title = title;
-    }
-    if (description) {
-        this.description = description;
-    }
-    if  (options) {
-        this.options = options;
-    }
+		if (title) {
+			this.title = title;
+		}
+		if (description) {
+			this.description = description;
+		}
+		if  (options) {
+			this.options = options;
+		}
+
+	}
+}
+
+class dsm {
+	constructor (title, description, version = '0.0.0', author){
+		this.title = title
+		this.description = description
+		this.version = version
+		this.author = author
+		this.contributors = []
+		this.stylesheet = ""
+		this.style = {
+			layout : {
+
+			}, 
+			theme : {
+
+			}
+		}
+		this.background_ces = []
+		this.background_images = []
+		this.ce_set = {
+			"0" : {
+				attributes : [
+					0
+				],
+				relationships : [
+
+				]
+			},
+			"1" : {
+				attributes : [
+					0
+				],
+				relationships : [
+
+				]
+			}
+		}
+		this.attributes = [
+			{
+				title = "kenny"
+			}
+		]
+		this.config = {
+			idle = 0,
+			menuDwell = 0,
+			popOverDwell = 0,
+			popOverShowDelay = 0
+		}
+	}
 }
 
 function ce(title, playlist, description, version = '0.0.0') {
@@ -89,5 +145,17 @@ function createCEs(db, assets, callback) {
     ], (err, res) => {
         console.log('Inserted the items');
         callback(res);
-    });
+	});
+}
+
+function populateDSMs(db, dsms, callback) {
+	const collection = db.collection('dsm')
+
+	collection.insertMany([
+		new dsm('Kenny', 'Californian man, pretty chill', version = '21.5.4'),
+		new dsm('Rivers', 'They have water and things', version='3.1.4')
+	], (err, res) =>  {
+		console.log('Inserted the items')
+		callback(res)
+	})
 }
