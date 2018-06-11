@@ -5,7 +5,7 @@ const url = 'mongodb://localhost:27017';
 const dbName = 'ds';
 const remoteURL = '66.62.91.16:60080/smds';
 
-MongoClient.connect(remoteURL, (err, client) => {
+MongoClient.connect(url, (err, client) => {
     assert.equal(null, err);
     console.log('Connected to server');
 
