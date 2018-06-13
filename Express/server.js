@@ -19,7 +19,7 @@ const dsm = require('./routes/dsm')
 //--------------------
 const app = express();
 const hostname = 'localhost';
-const port = 8080;
+const port = 30120;
 // path to the public files (this is the ember front-end)
 const static_dir = '../WebApp/dist';
 const static_path = path.join(__dirname, static_dir);
