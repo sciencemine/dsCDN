@@ -12,6 +12,7 @@ const express = require('express');
 //- Additional Routes -
 //---------------------
 const ce = require('./routes/ce');
+const dsm = require('./routes/dsm')
 
 //--------------------
 //- Script Constants -
