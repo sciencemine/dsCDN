@@ -34,6 +34,7 @@ app.listen(port, () => {
 //- App Static Files -
 //--------------------
 app.use(ce);
+app.use(dsm);
 // app.use(express.static(static_path, { dotfiles: 'ignore' }));
 
 //-----------------
