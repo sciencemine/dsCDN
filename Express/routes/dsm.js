@@ -11,7 +11,7 @@ let router = express.Router()
 
 router.route('/dsm/:id')
 .get((req, res) => {
-	let dsmID = new mongo.ObjectID(req.params.id);
+	let dsmID = new mongo.ObjectID(req.params.id)
 
 	//get the dsm from mongo database
 	MongoClient.connect(mongoURL, (err, client) => {
@@ -40,3 +40,5 @@ router.route('/dsm/:id')
 		.catch(queryErr) //I broke my promise guys, I'm sorry
 	})
 })
+
+module.exports = router;
