@@ -56,7 +56,7 @@ MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
 
                 // there is an id in the json and we don't want to push it into the db
                 delete asset.id;
-                
+
                 let assetObj = new Asset(asset.version, asset.url,
                         asset.type, asset);
 
@@ -96,7 +96,7 @@ MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
                                 });
                             }
                         });
-                        
+
                         let ceObj = new CE(ce.title, ce.version, ce.playlist, ce);
 
                         return add(db, ceColName, ceObj)
@@ -112,9 +112,6 @@ MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
                         let dsm = JSON.parse(fs.readFileSync(path.join(testDataDir,
                                 'hst.json'))),
                             ce_set = { };;
-
-                        // want to manually put this in here so i can read it
-                        dsm._id = dsm.id;
 
                         // delete the old one
                         delete dsm.id;
@@ -133,7 +130,7 @@ MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
                         }
 
                         dsm.ce_set = ce_set;
-            
+
                         let dsmObj = new DSM(dsm._id, dsm.title, dsm.description,
                                 dsm.version, dsm.author, dsm.config,
                                 dsm.stylesheet, dsm.style, dsm.contributors,
