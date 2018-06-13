@@ -18,7 +18,7 @@ const dsm = require('./routes/dsm')
 //- Script Constants -
 //--------------------
 const app = express();
-const hostname = 'localhost';
+const hostname = 'csdept26.mtech.edu';
 const port = 30120;
 // path to the public files (this is the ember front-end)
 const static_dir = '../WebApp/dist';
