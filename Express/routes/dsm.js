@@ -26,19 +26,32 @@ router.route('/dsm/:id')
 		const db = client.db(dbName)
 
 		//query time! woo!
-		query(db, 'dsm', dsmID) 
+		query(db, 'dsms', dsmID) 
 		.then((doc) => { //I *promise* to come back with things :P
-			let dsmObj = doc,
-				promises = [];
-			
-			for (let i = 0; i < dsmObj.ce_set.length; i++ ) {
-				let ceId = dsmObj.ce_set[i]
-				
-			}
-
+			let dsmObj = doc
+			let promises = []
+			res.status(200).json(dsmObj)
 		})
 		.catch(queryErr) //I broke my promise guys, I'm sorry
 	})
 })
 
-module.exports = router;
+function query(db, collectionName, id) {
+	return new Promise((resolve, reject) => {
+		let collection = db.collection(collectionName)
+
+		collection.find({_id: id }).toArray((err, doc) => {
+			if (err) {
+				reject(err)
+			}
+
+			resolve(doc[0])
+		})
+	})
+}
+
+function queryErr(err) {
+	console.error(err)
+}
+
+module.exports = router
