@@ -7,8 +7,7 @@ const express = require('express'),
 
 let router = express.Router()
 
-//This is a test comment
-
+//route returns a dsm of a particular id
 router.route('/dsm/:id')
 .get((req, res) => {
 	let dsmID = new mongo.ObjectID(req.params.id)
@@ -34,6 +33,48 @@ router.route('/dsm/:id')
 		})
 		.catch(queryErr) //I broke my promise guys, I'm sorry
 	})
+})
+.all((req, res) => {
+	res.status(405)
+})
+
+//a route that returns a list of all the dsms in the database
+router.route('/dsm')
+.get((req, res) => {
+	MongoClient.connect(mongoURL, (err, client) => {
+		if (err) {
+			console.error(err)
+
+			res.status(500)
+
+			return
+		}
+
+		const db = client.db(dbName)
+
+		let collection = db.collection('dsms')
+
+		collection.find({}, { 
+			projection: {
+				 _id: 1,
+				 title: 1,
+				 description: 1
+			} 
+		}).toArray((err, docs) => {
+			if (err) {
+				console.error(err)
+
+				res.status(500)
+
+				return
+			}
+
+			res.status(200).json(docs)
+		})
+	})	
+})
+.all((req, res) => {
+	res.status(405);
 })
 
 function query(db, collectionName, id) {
