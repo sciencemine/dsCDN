@@ -104,17 +104,30 @@ router.route('/dsm')
 		let dsm = JSON.parse(body) 
 
 		let dsmObj = new DSM(dsm._id, dsm.title, dsm.description,
-			dsm.version, dsm.author, dsm.config,
-			dsm.stylesheet, dsm.style, dsm.contributors,
-			dsm.idle_backgrounds, dsm.video_select_backgrounds,
-			dsm.ce_set, dsm.attributes)
-		
-		return add(db, dsmColName, dsmObj)
-		.then((res, result) => {
-			console.log(`Inserted a dsm with _id: ${result.insertedID}`)
-			res.status(200)
-			client.close()
-		})
+				dsm.version, dsm.author, dsm.config,
+				dsm.stylesheet, dsm.style, dsm.contributors,
+				dsm.idle_backgrounds, dsm.video_select_backgrounds,
+				dsm.ce_set, dsm.attributes)
+
+		//validate that all the ce elements in the set are in the database
+		let valid_ce_set = true
+		for (let ce in dsmObj.ce_set) {
+			db.collectionName.find({_id: ce}, {_id: 1}).limit(1)
+			.catch(() => {
+				valid_ce_set = false
+			})
+		}
+
+		if (valid_ce_set) {
+			return add(db, dsmColName, dsmObj)
+			.then((res, result) => {
+				console.log(`Inserted a dsm with _id: ${result.insertedID}`)
+				res.status(200)
+				client.close()
+			})
+		}
+		res.status(500)
+		return
 	})
 })
 .all((req, res) => {
