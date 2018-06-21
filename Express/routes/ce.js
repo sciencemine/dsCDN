@@ -3,7 +3,8 @@ const express = require('express'),
         mongo = require('mongodb'),
         MongoClient = mongo.MongoClient,
         mongoURL = 'mongodb://localhost:27017',
-        dbName = 'ds';
+        dbName = 'ds',
+        ceColName = 'ces'
 
 let router = express.Router();
 
@@ -110,6 +111,31 @@ router.route('/ce')
         });
     });
 })
+.post((req, res) => {
+    let body = req.body
+
+    MongoClient.connect(mongoURL, (err, client) =>  {
+        if (err) {
+            console.error(err)
+
+            res.status(500)
+
+            return
+        }
+
+        const db = client.db(dbName)
+
+        let collection = db.collection('ces')
+
+        let ce = JSON.parse(body)
+
+        let ceObj = new CE(ce.title, ce.version, ce.playlist, ce)
+
+        return add(db, ceColName, ceObj)
+
+
+    })
+})
 .all((req, res) => {
     res.status(405);
 });
@@ -128,6 +154,15 @@ function query(db, collectionName, id) {
 
 function queryErr(err) {
     console.error(err);
+}
+
+//Adds a new item to the database
+function add(db, collectionName, obj, opts = { }) {
+    return new Promise((resolve, reject) => {
+        let collection = db.collection(collectionName)
+
+        collection.insertOne(obj, opts).then(resolve).catch(reject)
+    })
 }
 
 module.exports = router;
