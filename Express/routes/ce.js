@@ -125,8 +125,6 @@ router.route('/ce')
 
         const db = client.db(dbName)
 
-        let collection = db.collection('ces')
-
         let ce = JSON.parse(body)
 
         let ceObj = new CE(ce.title, ce.version, ce.playlist, ce)

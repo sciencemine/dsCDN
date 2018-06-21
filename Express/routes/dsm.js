@@ -4,7 +4,6 @@
 const express = require('express'),
         mongo = require('mongodb'),
         MongoClient = mongo.MongoClient,
-		fs = require('fs'),
 		bodyParser = require('body-parser')
 		path = require('path')
 		assert = require('assert')
