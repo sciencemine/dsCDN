@@ -19,7 +19,7 @@ router.route('/asset')
 .post((req, res) => {
     let body = req.body
 
-    MongoClient.connect(mongoURL, (err, client) => {
+    MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
         if (err) {
             console.error(err)
 
@@ -39,6 +39,5 @@ router.route('/asset')
             res.status(200)
             return
         })
-
     })
 })

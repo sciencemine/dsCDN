@@ -1,7 +1,7 @@
 // This route is for defining dsm requests and stuff
 
 //requires
-const express = require('express'),
+const express = require('express')(),
         mongo = require('mongodb'),
         MongoClient = mongo.MongoClient,
 		bodyParser = require('body-parser')
@@ -16,7 +16,9 @@ const mongoURL = 'mongodb://localhost:27017',
 	dbName = 'ds',
 	dsmColName = 'dsms'
 
-router.use(bodyParser)
+//router.use(bodyParser)
+router.use(bodyParser.json())
+router.use(bodyParser.urlencoded({ extended: true }))
 
 //route returns a dsm of a particular id
 router.route('/dsm/:id')
@@ -54,7 +56,7 @@ router.route('/dsm/:id')
 //a route that returns a list of all the dsms in the database
 router.route('/dsm')
 .get((req, res) => {
-	MongoClient.connect(mongoURL, (err, client) => {
+	MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
 		if (err) {
 			console.error(err)
 
@@ -67,22 +69,22 @@ router.route('/dsm')
 
 		let collection = db.collection('dsms')
 
+		//find all dsms and grab their _id, title, and desc
 		collection.find({}, { 
-			projection: {
 				 _id: 1,
 				 title: 1,
 				 description: 1
-			} 
-		}).toArray((err, docs) => {
-			if (err) {
+			}
+		).toArray((err, docs) => { //add it to an array named docs
+			if (err) { //check for errors
 				console.error(err)
 
-				res.status(500)
+				res.status(500).send()
 
 				return
 			}
 
-			res.status(200).json(docs)
+			res.status(200).json(docs) //return the array
 		})
 	})	
 })
@@ -101,6 +103,8 @@ router.route('/dsm')
 		const db = client.db(dbName)
 
 		let dsm = JSON.parse(body) 
+		
+		console.log(dsm)
 
 		let dsmObj = new DSM(dsm._id, dsm.title, dsm.description,
 				dsm.version, dsm.author, dsm.config,

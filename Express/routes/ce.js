@@ -84,7 +84,7 @@ router.route('/ce/:id')
 
 router.route('/ce')
 .get((req, res) => {
-    MongoClient.connect(mongoURL, (err, client) => {
+    MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
         if (err) {
             console.error(err);
 
@@ -92,7 +92,6 @@ router.route('/ce')
 
             return;
         }
-
 
         const db = client.db(dbName);
 
@@ -102,7 +101,7 @@ router.route('/ce')
             if (err) {
                 console.error(err);
 
-                res.status(500);
+                res.status(500).send();
 
                 return;
             }
@@ -114,7 +113,7 @@ router.route('/ce')
 .post((req, res) => {
     let body = req.body
 
-    MongoClient.connect(mongoURL, (err, client) =>  {
+    MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) =>  {
         if (err) {
             console.error(err)
 
@@ -130,7 +129,6 @@ router.route('/ce')
         let ceObj = new CE(ce.title, ce.version, ce.playlist, ce)
 
         return add(db, ceColName, ceObj)
-
 
     })
 })
