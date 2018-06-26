@@ -136,7 +136,7 @@ MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) => {
                                 dsm.stylesheet, dsm.style, dsm.contributors,
                                 dsm.idle_backgrounds,
                                 dsm.video_select_backgrounds, dsm.ce_set,
-                                dsm.attributes);
+                                dsm.attributes, dsm.tactile);
 
                         return add(db, dsmColName, dsmObj)
                         .then((result) => {
