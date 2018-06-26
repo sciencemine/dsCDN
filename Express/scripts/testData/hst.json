@@ -12,10 +12,10 @@
         "popoverShowDelay": 0.2
     },
     "tactile": {
-        "select": [ "d" ],
+        "select": [ "w" ],
         "previous": [ "a" ],
         "cancel": [ "s" ],
-        "next": [ "h" ]
+        "next": [ "d" ]
     },
     "stylesheet": "",
     "style": {
