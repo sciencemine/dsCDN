@@ -4,9 +4,18 @@ const express = require('express'),
         MongoClient = mongo.MongoClient,
         mongoURL = 'mongodb://localhost:27017',
         dbName = 'ds',
-        ceColName = 'ces'
+        ceColName = 'ces',
+		bodyParser = require('body-parser')
+
+//local requires
+const Asset = require('../classes/asset'),
+    CE = require('../classes/ce'),
+    DSM = require('../classes/dsm');
 
 let router = express.Router();
+
+router.use(bodyParser.json())
+router.use(bodyParser.urlencoded({ extended: true }))
 
 router.route('/ce/:id')
 .get((req, res) => {
@@ -111,7 +120,7 @@ router.route('/ce')
     });
 })
 .post((req, res) => {
-    let body = req.body
+    let ce = req.body
 
     MongoClient.connect(mongoURL, { useNewUrlParser: true }, (err, client) =>  {
         if (err) {
@@ -124,12 +133,16 @@ router.route('/ce')
 
         const db = client.db(dbName)
 
-        let ce = JSON.parse(body)
-
         let ceObj = new CE(ce.title, ce.version, ce.playlist, ce)
 
         return add(db, ceColName, ceObj)
-
+        .then((results) => {
+            console.log(`added a ce with _id: ${results.insertedId}`)
+            res.status(200).send(`added a ce with _id: ${results.insertedId}`)
+        })
+        .catch(() => {
+            res.status(500)
+        })
     })
 })
 .all((req, res) => {

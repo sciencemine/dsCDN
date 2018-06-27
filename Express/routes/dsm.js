@@ -1,13 +1,17 @@
 // This route is for defining dsm requests and stuff
 
 //requires
-const express = require('express')(),
+const express = require('express'),
         mongo = require('mongodb'),
         MongoClient = mongo.MongoClient,
 		bodyParser = require('body-parser')
 		path = require('path')
 		assert = require('assert')
 
+//local requires
+const Asset = require('../classes/asset'),
+    CE = require('../classes/ce'),
+    DSM = require('../classes/dsm');
 
 let router = express.Router()
 
@@ -16,7 +20,6 @@ const mongoURL = 'mongodb://localhost:27017',
 	dbName = 'ds',
 	dsmColName = 'dsms'
 
-//router.use(bodyParser)
 router.use(bodyParser.json())
 router.use(bodyParser.urlencoded({ extended: true }))
 
@@ -89,7 +92,7 @@ router.route('/dsm')
 	})	
 })
 .post((req, res) => {
-	let body = req.body;
+	let dsm = req.body
 	
 	MongoClient.connect(mongoURL, {useNewUrlParser: true},  (err, client) => {
 		if (err) {
@@ -102,9 +105,7 @@ router.route('/dsm')
 
 		const db = client.db(dbName)
 
-		let dsm = JSON.parse(body) 
-		
-		console.log(dsm)
+		//let dsm = JSON.parse(body) 
 
 		let dsmObj = new DSM(dsm._id, dsm.title, dsm.description,
 				dsm.version, dsm.author, dsm.config,
@@ -123,10 +124,14 @@ router.route('/dsm')
 
 		if (valid_ce_set) {
 			return add(db, dsmColName, dsmObj)
-			.then((res, result) => {
-				console.log(`Inserted a dsm with _id: ${result.insertedID}`)
-				res.status(200)
+			.then((results) => {
+				console.log(`added dsm with _id: ${results.insertedId}`)
+				res.status(200).send(`added dsm with _id: ${results.insertedId}`)
 				client.close()
+			})
+			.catch((err) => {
+				console.error(err)
+				res.status(500)
 			})
 		}
 		res.status(500)
@@ -159,7 +164,7 @@ function add(db, collectionName, obj, opts = { }) {
 	return new Promise((resolve, reject) => {
 		let collection = db.collection(collectionName)
 
-		collection.insertOne(obj, opts).then(resolve).catch(reject);
+		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); });
 	})
 }
 
