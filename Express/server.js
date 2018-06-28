@@ -11,8 +11,9 @@ const express = require('express');
 //---------------------
 //- Additional Routes -
 //---------------------
-const ce = require('./routes/ce');
-const dsm = require('./routes/dsm')
+const ce    = require('./routes/ce');
+const dsm   = require('./routes/dsm')
+const asset = require('./routes/asset')
 
 //--------------------
 //- Script Constants -
@@ -46,6 +47,7 @@ app.listen(port, () => {
 //--------------------
 app.use(ce);
 app.use(dsm);
+app.use(asset)
 // app.use(express.static(static_path, { dotfiles: 'ignore' }));
 
 //-----------------
