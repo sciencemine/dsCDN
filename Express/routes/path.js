@@ -4,10 +4,11 @@ const express = require('express'),
         MongoClient = mongo.MongoClient,
 		bodyParser = require('body-parser')
 		path = require('path')
-		assert = require('assert')
+        assert = require('assert')
 
 //local requires
 const PATH = require('../classes/path')
+//        util = require('../util')
 
 let router = express.Router()
 
@@ -23,7 +24,7 @@ router.route('/path/:id')
 .get((req, res) => {
     let pathID = new mongo.ObjectID(req.params.id) 
 
-    MongoClient.connect(mongoURL, (err, client) => {
+    MongoClient.connect(mongoURL, {useNewUrlParser : true}, (err, client) => {
 		if (err) {
 			console.error(err)
 
@@ -34,14 +35,16 @@ router.route('/path/:id')
 
         const db = client.db(dbName)
 
-        query(db, 'paths', pathID)
+        query(db, pathColName, pathID)
         .then((doc) => {
             let pathObj = doc
-            let promises = []
             res.status(200).json(pathObj)
         })
         .catch(queryErr)
     })
+})
+.put((req, res) => {
+   res.send('I did a thing!')
 })
 .all((req, res) => {
     res.status(405).send()
@@ -49,8 +52,7 @@ router.route('/path/:id')
 
 router.route('/path')
 .get((req, res) => {
-    
-    MongoClient.connect(mongoURL, (err, client) => {
+    MongoClient.connect(mongoURL, {useNewUrlParser: true}, (err, client) => {
         if (err) {
             console.error(err)
 
@@ -71,8 +73,33 @@ router.route('/path')
 
                 return
             }
-
             res.status(200).json(doc)
+        })
+    })
+})
+.post((req, res) => {
+    let path = req.body
+
+    MongoClient.connect(mongoURL, {useNewUrlParser: true}, (err, client) => {
+        if (err) {
+            console.error(err)
+
+            res.status(500).send()
+
+            return
+        }
+
+        let db = client.db(dbName)
+
+        pathObj = new PATH(path.id, path.model, path.relations)
+
+        return add(db, pathColName, pathObj)
+        .then((results) => {
+            console.log(`added a path with the _id ${results.insertedId}`)
+            res.status(200).json({"pathId": `${results.insertedId}`})
+        })
+        .catch((err) => {
+            console.error(err)
         })
     })
 })
@@ -96,6 +123,15 @@ function query(db, collectionName, id) {
 
 function queryErr(err) {
 	console.error(err)
+}
+
+function add(db, collectionName, obj, opts = { }) {
+	return new Promise((resolve, reject) => {
+		console.log(typeof(db))
+		let collection = db.collection(collectionName)
+
+		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); })
+	})
 }
 
 module.exports = router
