@@ -57,6 +57,29 @@ db.createCollection( "dsm", {
                     }
                 }
             },
+            tactile: {
+                bsonType: "object",
+                required: [
+                    "select",
+                    "previous",
+                    "cancel",
+                    "next"
+                ],
+                properties: {
+                    select: {
+                        bsonType: "array",
+                    },
+                    previous: {
+                        bsonType: "array"
+                    },
+                    cancel: {
+                        bsonType: "array"
+                    },
+                    next: {
+                        bsonType: "array"
+                    }
+                }
+            },
             stylesheet: {
                 bsonType: "string",
                 description: "url to the style to use"
@@ -158,6 +181,65 @@ db.createCollection("assets", {
                     },
                     duration: {
                         bsonType: "string"
+                    }
+                }
+            }
+        }
+    }}
+})
+
+db.createCollection("paths", {
+    validator: { $jsonschema: {
+        bsonType: "object",
+        required: [
+            "_id",
+            "model",
+        ],
+        properties: {
+            _id: {
+                bsonType: "string"
+            },
+            model: {
+                bsonType: "object",
+                required: [
+                    "_id",
+                    "version",
+                    "author"
+                ],
+                properties: {
+                    _id: {
+                        bsonType: "string"
+                    },
+                    version: {
+                        bsonType: "string"
+                    },
+                    description: {
+                        bsonType: "string"
+                    },
+                    author : {
+                        bsonType: "string"
+                    }
+                }
+            },
+            relations: {
+                bsonType: "object",
+                required: [
+                    "title",
+                    "weight",
+                    "ce_list",
+                ],
+                properties: {
+                    title: {
+                        bsonType: "string"
+                    },
+                    weight: {
+                        bsonType: "int"
+                    },
+                    description: {
+                        bsonType: "string"
+                    },
+                    ce_list: {
+                        bsonType: "array"
                     }
                 }
             }
