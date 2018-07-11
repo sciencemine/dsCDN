@@ -8,6 +8,7 @@ yarn-error.log*
 # test file
 test.http
 testassets
+req.py
 
 # Runtime data
 pids

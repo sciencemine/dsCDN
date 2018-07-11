@@ -70,7 +70,7 @@ router.route('/dsm')
 
 		const db = client.db(dbName)
 
-		let collection = db.collection('dsms')
+		let collection = db.collection(dsmColName)
 
 		//find all dsms and grab their _id, title, and desc
 		collection.find({}, { 
