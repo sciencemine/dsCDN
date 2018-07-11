@@ -44,11 +44,34 @@ router.route('/path/:id')
     })
 })
 .put((req, res) => {
-   res.send('I did a thing!')
+    let pathID = new mongo.ObjectID(req.params.id)
+    let relation = req.body
+
+    MongoClient.connect(mongoURL, {useNewUrlParser: true}, (err, client) => {
+        if (err) {
+            console.error(err)
+
+            res.status(500).send()
+
+            return
+        }
+
+        const db = client.db(dbName)
+
+        addRelation(db, pathColName, relation, pathID)
+        .then((results) => {
+            res.status(200).send()
+        })
+        .catch((err) => {
+            console.error(err)
+        })
+        
+    })
 })
 .all((req, res) => {
     res.status(405).send()
 })
+
 
 router.route('/path')
 .get((req, res) => {
@@ -125,6 +148,7 @@ function queryErr(err) {
 	console.error(err)
 }
 
+//adds a new item to the database
 function add(db, collectionName, obj, opts = { }) {
 	return new Promise((resolve, reject) => {
 		console.log(typeof(db))
@@ -132,6 +156,20 @@ function add(db, collectionName, obj, opts = { }) {
 
 		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); })
 	})
+}
+
+//Adds a new relation to the database
+function addRelation(db, collectionName, rel, pathId) {
+    return new Promise((resolve, reject) => {
+        let collection = db.collection(collectionName)
+
+        collection.updateOne({ _id : pathId},
+        {
+            $addToSet : {
+                relations : rel
+            }
+        }).then(resolve).catch((err) => { console.log(err); reject(err); })
+    })
 }
 
 module.exports = router

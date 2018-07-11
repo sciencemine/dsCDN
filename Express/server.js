@@ -27,7 +27,7 @@ const static_dir = '../WebApp/dist';
 const static_path = path.join(__dirname, static_dir);
 
 var allowCrossDomainGet = function(req, res, next) {
-    if ('GET' === req.method) {
+    if ('GET' === req.method || 'PUT' === req.method) {
         res.header('Access-Control-Allow-Origin', '*');
     }
 
