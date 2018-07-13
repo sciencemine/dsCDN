@@ -27,6 +27,24 @@ describe('Routes', () => {
         .expect(200, done)
     })
 
+    it('[GET] /path', (done) => {
+        request(url)
+        .get('/path')
+        .expect(200, done)
+    })
+
+    it('[GET] /path/:id', (done) => {
+        request(url)
+        .get('/path/5b3e9560affc0b6f593c4ff3')
+        .expect(200, done)
+    })
+
+    it('[PUT] /path/:id', (done) => {
+        request(url)
+        .put('/path/5b3e9560affc0b6f593c4ff3')
+        .expect(200, done)
+    })
+
     //test post requests of all endpoints
     it('[POST] /ce', (done) => {
         request(url)
@@ -46,15 +64,16 @@ describe('Routes', () => {
         .expect(200, done)
     })
 
+    it('[POST] /path', (done) => {
+        request(url)
+        .post('/path')
+        .expect(200, done)
+    })
+
     //all other requests should error
-    
     it('[GET] FAIL', (done) => {
         request(url)
         .post('/unicorns/farts')
         .expect(400, done)
     })
-
-
-
-
 })

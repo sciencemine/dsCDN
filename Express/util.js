@@ -1,18 +1,5 @@
 //A set of untility functions to reduce code repition
 
-const express = require('express'),
-        mongo = require('mongodb'),
-        MongoClient = mongo.MongoClient,
-		bodyParser = require('body-parser')
-		path = require('path')
-        assert = require('assert')
-
-// constants
-const mongoURL = 'mongodb://localhost:27017',
-    dbName = 'ds',
-    pathColName = 'paths'
-
-
 function query(db, collectionName, id) {
 	return new Promise((resolve, reject) => {
 		let collection = db.collection(collectionName)
@@ -40,4 +27,4 @@ function add(db, collectionName, obj, opts = { }) {
 	})
 }
 
-module.exports = add, query, queryErr
+module.exports = { add, queryErr, query}
