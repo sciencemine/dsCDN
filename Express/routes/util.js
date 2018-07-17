@@ -1,5 +1,4 @@
 //A set of untility functions to reduce code repition
-
 function query(db, collectionName, id) {
 	return new Promise((resolve, reject) => {
 		let collection = db.collection(collectionName)
@@ -27,4 +26,18 @@ function add(db, collectionName, obj, opts = { }) {
 	})
 }
 
-module.exports = { add, queryErr, query}
+//Adds a new relation to the database
+function addRelation(db, collectionName, rel, pathId) {
+    return new Promise((resolve, reject) => {
+        let collection = db.collection(collectionName)
+
+        collection.updateOne({ _id : pathId},
+        {
+            $addToSet : {
+                relations : rel
+            }
+        }).then(resolve).catch((err) => { console.log(err); reject(err); })
+    })
+}
+
+module.exports =  {add, queryErr, query, addRelation}

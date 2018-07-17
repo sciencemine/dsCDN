@@ -7,8 +7,8 @@ const express = require('express'),
         assert = require('assert')
 
 //local requires
-const PATH = require('../classes/path')
-//        util = require('../util')
+const PATH = require('../classes/path'),
+        utils = require('./util')
 
 let router = express.Router()
 
@@ -35,12 +35,12 @@ router.route('/path/:id')
 
         const db = client.db(dbName)
 
-        query(db, pathColName, pathID)
+        utils.query(db, pathColName, pathID)
         .then((doc) => {
             let pathObj = doc
             res.status(200).json(pathObj)
         })
-        .catch(queryErr)
+        .catch(utils.queryErr)
     })
 })
 .put((req, res) => {
@@ -57,8 +57,7 @@ router.route('/path/:id')
         }
 
         const db = client.db(dbName)
-
-        addRelation(db, pathColName, relation, pathID)
+        utils.addRelation(db, pathColName, relation, pathID)
         .then((results) => {
             res.status(200).send()
         })
@@ -114,12 +113,12 @@ router.route('/path')
 
         let db = client.db(dbName)
 
-        pathObj = new PATH(path.id, path.model, path.relations)
+        pathObj = new PATH(path._id, path.model, path.relations)
 
-        return add(db, pathColName, pathObj)
+        return utils.add(db, pathColName, pathObj)
         .then((results) => {
             console.log(`added a path with the _id ${results.insertedId}`)
-            res.status(200).json({"pathId": `${results.insertedId}`})
+            res.status(201).json({"pathId": `${results.insertedId}`})
         })
         .catch((err) => {
             console.error(err)
@@ -129,47 +128,5 @@ router.route('/path')
 .all((req, res) => {
     res.status(405).send()
 })
-
-function query(db, collectionName, id) {
-	return new Promise((resolve, reject) => {
-		let collection = db.collection(collectionName)
-
-		collection.find({_id: id }).toArray((err, doc) => {
-			if (err) {
-				reject(err)
-			}
-
-			resolve(doc[0])
-		})
-	})
-}
-
-function queryErr(err) {
-	console.error(err)
-}
-
-//adds a new item to the database
-function add(db, collectionName, obj, opts = { }) {
-	return new Promise((resolve, reject) => {
-		console.log(typeof(db))
-		let collection = db.collection(collectionName)
-
-		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); })
-	})
-}
-
-//Adds a new relation to the database
-function addRelation(db, collectionName, rel, pathId) {
-    return new Promise((resolve, reject) => {
-        let collection = db.collection(collectionName)
-
-        collection.updateOne({ _id : pathId},
-        {
-            $addToSet : {
-                relations : rel
-            }
-        }).then(resolve).catch((err) => { console.log(err); reject(err); })
-    })
-}
 
 module.exports = router

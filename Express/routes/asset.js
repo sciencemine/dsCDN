@@ -11,7 +11,8 @@ const mongoURL = 'mongodb://localhost:27017',
     assetColName = 'asset',
     dsmColName = 'dsms'
     
-const Asset = require('../classes/asset')
+const Asset = require('../classes/asset'),
+    utils = require('./util')
 
 let router = express.Router()
 
@@ -62,9 +63,9 @@ router.route('/asset')
 
         let assetObj = new Asset(asset.version, asset.url, asset.type, asset.options)
 
-        return add(db, assetColName, assetObj)
+        return utils.add(db, assetColName, assetObj)
         .then((result) => {
-            res.status(200).send(`added asset with _id: ${result.insertedId}`)
+            res.status(201).send(`added asset with _id: ${result.insertedId}`)
             return
         })
     })
@@ -72,14 +73,5 @@ router.route('/asset')
 .all((req, res) => {
     res.status(405)
 })
-
-//Adds a new item to the database
-function add(db, collectionName, obj, opts = { }) {
-    return new Promise((resolve, reject) => {
-        let collection = db.collection(collectionName)
-
-        collection.insertOne(obj, opts).then(resolve).catch(reject)
-    })
-}
 
 module.exports = router;

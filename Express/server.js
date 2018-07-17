@@ -26,15 +26,18 @@ const port = 30120;
 const static_dir = '../WebApp/dist';
 const static_path = path.join(__dirname, static_dir);
 
-var allowCrossDomainGet = function(req, res, next) {
-    if ('GET' === req.method || 'PUT' === req.method) {
+var allowCrossDomain = function(req, res, next) {
+    if ('GET' === req.method || 'POST' === req.method || 'PUT' === req.method) {
         res.header('Access-Control-Allow-Origin', '*');
+        next();
     }
-
-    next();
+    else if ('OPTIONS' === req.method) {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Methods', 'GET,PUT,POST');
+        res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+        res.sendStatus(200);
+    }
 };
-
-app.use(allowCrossDomainGet);
 
 //-------------------
 //- Server Listener -

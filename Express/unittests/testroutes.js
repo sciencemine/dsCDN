@@ -49,25 +49,25 @@ describe('Routes', () => {
     it('[POST] /ce', (done) => {
         request(url)
         .post('/ce')
-        .expect(200, done)
+        .expect(201, done)
     })
 
     it('[POST] /dsm', (done) => {
         request(url)
         .post('/dsm')
-        .expect(200, done)
+        .expect(201, done)
     })
 
     it('[POST] /asset', (done) => {
         request(url)
         .post('/asset')
-        .expect(200, done)
+        .expect(201, done)
     })
 
     it('[POST] /path', (done) => {
         request(url)
         .post('/path')
-        .expect(200, done)
+        .expect(201, done)
     })
 
     //all other requests should error
