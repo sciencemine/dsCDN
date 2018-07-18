@@ -19,7 +19,6 @@ function queryErr(err) {
 
 function add(db, collectionName, obj, opts = { }) {
 	return new Promise((resolve, reject) => {
-		console.log(typeof(db))
 		let collection = db.collection(collectionName)
 
 		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); })

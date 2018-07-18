@@ -1,8 +1,3 @@
-//---------------------------------
-//- Built-In Node Module Requires -
-//---------------------------------
-const path = require('path');
-
 //------------------------
 //- Node Module Requires -
 //------------------------
@@ -19,12 +14,8 @@ const graph_path  = require('./routes/path')
 //--------------------
 //- Script Constants -
 //--------------------
-const app = express();
 const hostname = 'csdept26.mtech.edu';
 const port = 30120;
-// path to the public files (this is the ember front-end)
-const static_dir = '../WebApp/dist';
-const static_path = path.join(__dirname, static_dir);
 
 var allowCrossDomain = function(req, res, next) {
     if ('GET' === req.method || 'POST' === req.method || 'PUT' === req.method) {
@@ -39,35 +30,41 @@ var allowCrossDomain = function(req, res, next) {
     }
 };
 
-//-------------------
-//- Server Listener -
-//-------------------
-app.listen(port, () => {
-    console.log(`Listening at "${hostname}:${port}"`);
-});
 
-//--------------------
-//- App Static Files -
-//--------------------
-app.use(ce);
-app.use(dsm);
-app.use(asset)
-app.use(graph_path)
-// app.use(express.static(static_path, { dotfiles: 'ignore' }));
+function Server() {
+    let app = express();
+    //-------------------
+    //- Server Listener -
+    //-------------------
+    
 
-//-----------------
-//- Set up Routes -
-//-----------------
+    //Allow CORS
+    app.use(allowCrossDomain)
+
+    //-----------------
+    //- Set up Routes -
+    //-----------------
+    app.use(ce);
+    app.use(dsm);
+    app.use(asset)
+    app.use(graph_path)
+
+    // All other routes
+    app.route('*')
+    // Define get requests to 404
+    .get((req, res) => {
+        res.status(404).send('Page not Found\n');
+    })
+    .all(badRequest);
+
+    return app.listen(port, () => {
+        console.log(`Listening at "${hostname}:${port}"`);
+    });
+}
+
 // Bad request
 function badRequest(req, res) {
     res.status(400).send('Bad Request\n');
 }
 
-// All other routes
-app.route('*')
-// Define get requests to 404
-.get((req, res) => {
-    res.status(404).send('Page not Found\n');
-})
-.all(badRequest);
-
+module.exports = Server
