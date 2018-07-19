@@ -8,9 +8,8 @@ const express = require('express'),
 		bodyParser = require('body-parser')
 
 //local requires
-const Asset = require('../classes/asset'),
-    CE = require('../classes/ce'),
-    DSM = require('../classes/dsm');
+const CE = require('../classes/ce'),
+    utils = require('./util')
 
 let router = express.Router();
 
@@ -34,7 +33,7 @@ router.route('/ce/:id')
         const db = client.db(dbName);
 
         // do the query
-        query(db, 'ces', ceID)
+        utils.query(db, 'ces', ceID)
         .then((doc) => {
             let ceObj = doc,
                     promises = [],
@@ -42,11 +41,11 @@ router.route('/ce/:id')
 
             // if the playlist has a teaser query for it
             if (!Array.isArray(ceObj.playlist[0])) {
-                query(db, 'assets', new mongo.ObjectID(ceObj.playlist[0]))
+                utils.query(db, 'assets', new mongo.ObjectID(ceObj.playlist[0]))
                 .then((doc) => {
                     ceObj.playlist[0] = doc;
                 })
-                .catch(queryErr);
+                .catch(utils.queryErr);
 
                 hasTeaser = true;
             }
@@ -60,7 +59,7 @@ router.route('/ce/:id')
                         .then((doc) => {
                             assetList[0] = doc;
                         })
-                        .catch(queryErr));
+                        .catch(utils.queryErr));
 
                 // replace all concurrent assets
                 assetList[1].forEach((conAsset, index) => {
@@ -68,7 +67,7 @@ router.route('/ce/:id')
                             .then((doc) => {
                                 assetList[1][index] = doc;
                             })
-                            .catch(queryErr));
+                            .catch(utils.queryErr));
                 });
             }
 
@@ -135,10 +134,10 @@ router.route('/ce')
 
         let ceObj = new CE(ce.title, ce.version, ce.playlist, ce)
 
-        return add(db, ceColName, ceObj)
+        return utils.add(db, ceColName, ceObj)
         .then((results) => {
             console.log(`added a ce with _id: ${results.insertedId}`)
-            res.status(200).send(`added a ce with _id: ${results.insertedId}`)
+            res.status(201).send(`added a ce with _id: ${results.insertedId}`)
         })
         .catch(() => {
             res.status(500)
@@ -148,30 +147,5 @@ router.route('/ce')
 .all((req, res) => {
     res.status(405);
 });
-
-function query(db, collectionName, id) {
-    return new Promise((resolve, reject) => {
-        let collection = db.collection(collectionName);
-
-        collection.find({ _id: id }).toArray((err, doc) => {
-            if (err) reject(err);
-
-            resolve(doc[0]);
-        });
-    });
-}
-
-function queryErr(err) {
-    console.error(err);
-}
-
-//Adds a new item to the database
-function add(db, collectionName, obj, opts = { }) {
-    return new Promise((resolve, reject) => {
-        let collection = db.collection(collectionName)
-
-        collection.insertOne(obj, opts).then(resolve).catch(reject)
-    })
-}
 
 module.exports = router;

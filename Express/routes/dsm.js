@@ -9,9 +9,8 @@ const express = require('express'),
 		assert = require('assert')
 
 //local requires
-const Asset = require('../classes/asset'),
-    CE = require('../classes/ce'),
-    DSM = require('../classes/dsm');
+const  DSM = require('../classes/dsm'),
+	utils = require('./util');
 
 let router = express.Router()
 
@@ -41,13 +40,13 @@ router.route('/dsm/:id')
 		const db = client.db(dbName)
 
 		//query time! woo!
-		query(db, 'dsms', dsmID) 
+		utils.query(db, 'dsms', dsmID) 
 		.then((doc) => { //I *promise* to come back with things :P
 			let dsmObj = doc
 			let promises = []
 			res.status(200).json(dsmObj)
 		})
-		.catch(queryErr) //I broke my promise guys, I'm sorry
+		.catch(utils.queryErr) //I broke my promise guys, I'm sorry
 	})
 })
 
@@ -70,7 +69,7 @@ router.route('/dsm')
 
 		const db = client.db(dbName)
 
-		let collection = db.collection('dsms')
+		let collection = db.collection(dsmColName)
 
 		//find all dsms and grab their _id, title, and desc
 		collection.find({}, { 
@@ -123,10 +122,10 @@ router.route('/dsm')
 		}
 
 		if (valid_ce_set) {
-			return add(db, dsmColName, dsmObj)
+			return utils.add(db, dsmColName, dsmObj)
 			.then((results) => {
 				console.log(`added dsm with _id: ${results.insertedId}`)
-				res.status(200).send(`added dsm with _id: ${results.insertedId}`)
+				res.status(201).send(`added dsm with _id: ${results.insertedId}`)
 				client.close()
 			})
 			.catch((err) => {
@@ -141,31 +140,5 @@ router.route('/dsm')
 .all((req, res) => {
 	res.status(405);
 })
-
-function query(db, collectionName, id) {
-	return new Promise((resolve, reject) => {
-		let collection = db.collection(collectionName)
-
-		collection.find({_id: id }).toArray((err, doc) => {
-			if (err) {
-				reject(err)
-			}
-
-			resolve(doc[0])
-		})
-	})
-}
-
-function queryErr(err) {
-	console.error(err)
-}
-
-function add(db, collectionName, obj, opts = { }) {
-	return new Promise((resolve, reject) => {
-		let collection = db.collection(collectionName)
-
-		collection.insertOne(obj, opts).then(resolve).catch((err) => { console.log(err); reject(err); });
-	})
-}
 
 module.exports = router
