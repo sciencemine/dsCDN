@@ -1,0 +1,9 @@
+*.http
+
+hst.json
+
+dsCDN
+ 
+.vscode/
+
+mime-reader/
